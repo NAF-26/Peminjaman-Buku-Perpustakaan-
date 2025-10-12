@@ -1,6 +1,6 @@
 "use client";
 
-import { cn } from "@/lib/utils"; // ✅ pakai @/
+import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -30,10 +30,8 @@ export function LoginForm({
     e.preventDefault();
     setIsLoading(true);
 
-    // Redirect setelah 500ms
     setTimeout(() => {
-      router.push("/dashboard"); // ✅ pastikan route ini ada!
-      // router.refresh(); ← hapus saja, tidak perlu
+      router.push("/dashboard");
     }, 500);
   };
 

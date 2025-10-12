@@ -24,7 +24,7 @@ export default function AboutPage() {
               Peminjaman Buku Perpustakaan
             </h2>
             <p className="text-gray-300 leading-relaxed">
-              Aplikasi manajemen perpustakaan sederhana untuk membantu
+              Website manajemen perpustakaan sederhana untuk membantu
               pengelolaan peminjaman dan pengembalian buku secara digital.
             </p>
           </div>
@@ -44,7 +44,7 @@ export default function AboutPage() {
             </h3>
             <p>
               PerpusKu dirancang untuk memudahkan petugas perpustakaan atau
-              komunitas kecil dalam mencatat, mengelola, dan melacak aktivitas
+              siswa siswi dalam mencatat, mengelola, dan melacak aktivitas
               peminjaman buku tanpa ribet. Cocok untuk sekolah, kampus, atau
               taman baca.
             </p>

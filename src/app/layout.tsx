@@ -24,9 +24,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+      <body className="bg-gradient-to-br from-gray-900 via-blue-900 to-blue-700 min-h-screen">
         {children}
       </body>
     </html>

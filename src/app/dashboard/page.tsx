@@ -127,7 +127,7 @@ export default function DashboardPage() {
         </Card>
         <Card className="bg-slate-800 border border-blue-700/50">
           <CardHeader>
-            <CardTitle className="text-white">Peminjam Unik</CardTitle>
+            <CardTitle className="text-white">Peminjam</CardTitle>
           </CardHeader>
           <CardContent className="text-2xl font-bold text-white">
             {new Set(bukuList.map((b) => b.peminjam)).size}

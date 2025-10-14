@@ -75,8 +75,11 @@ export default function DashboardPage() {
       );
     }
 
+    const nextId =
+      bukuList.length > 0 ? Math.max(...bukuList.map((b) => b.id)) + 1 : 1;
+
     const newBuku: Buku = {
-      id: Date.now(),
+      id: nextId,
       judul: newBukuJudul,
       pengarang: newPengarang,
       peminjam: newPeminjam,

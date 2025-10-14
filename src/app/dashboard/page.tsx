@@ -120,7 +120,7 @@ export default function DashboardPage() {
         Peminjaman Buku Perpustakaan
       </h1>
 
-      {/* Form Input Buku - Vertikal */}
+      {/* Form Input Buku */}
       <Card className="bg-slate-800 border border-blue-700/50">
         <CardHeader>
           <CardTitle className="text-white">Tambah Peminjaman Baru</CardTitle>

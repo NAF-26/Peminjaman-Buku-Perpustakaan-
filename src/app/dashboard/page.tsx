@@ -10,6 +10,7 @@ interface Buku {
   judul: string;
   pengarang: string;
   peminjam: string;
+  petugas: string;
   tanggalPinjam: string;
   tanggalKembali: string;
 }
@@ -21,6 +22,7 @@ export default function DashboardPage() {
       judul: "Matematika Dasar",
       pengarang: "Prof. Sukirman",
       peminjam: "Ghaly",
+      petugas: "Bu Siti",
       tanggalPinjam: "2025-10-07",
       tanggalKembali: "2025-10-14",
     },
@@ -29,6 +31,7 @@ export default function DashboardPage() {
       judul: "Fisika Lanjut",
       pengarang: "Dr. Ahmad Fauzi",
       peminjam: "Naufal",
+      petugas: "Pak Budi",
       tanggalPinjam: "2025-10-01",
       tanggalKembali: "",
     },
@@ -37,16 +40,18 @@ export default function DashboardPage() {
   const [newBukuJudul, setNewBukuJudul] = useState("");
   const [newPengarang, setNewPengarang] = useState("");
   const [newPeminjam, setNewPeminjam] = useState("");
+  const [newPetugas, setNewPetugas] = useState("");
 
   const handleTambah = () => {
-    if (!newBukuJudul || !newPengarang || !newPeminjam)
-      return alert("Isi judul, pengarang, dan peminjam!");
+    if (!newBukuJudul || !newPengarang || !newPeminjam || !newPetugas)
+      return alert("Isi judul, pengarang, peminjam, dan petugas!");
 
     const newBuku: Buku = {
       id: Date.now(),
       judul: newBukuJudul,
       pengarang: newPengarang,
       peminjam: newPeminjam,
+      petugas: newPetugas,
       tanggalPinjam: new Date().toISOString().split("T")[0],
       tanggalKembali: "",
     };
@@ -55,6 +60,7 @@ export default function DashboardPage() {
     setNewBukuJudul("");
     setNewPengarang("");
     setNewPeminjam("");
+    setNewPetugas("");
   };
 
   const handleHapus = (id: number) => {
@@ -106,6 +112,12 @@ export default function DashboardPage() {
               placeholder="Nama Peminjam"
               value={newPeminjam}
               onChange={(e) => setNewPeminjam(e.target.value)}
+              className="flex-1 text-white bg-transparent placeholder:text-gray-300 border border-slate-600 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/50 rounded-md"
+            />
+            <Input
+              placeholder="Nama Petugas"
+              value={newPetugas}
+              onChange={(e) => setNewPetugas(e.target.value)}
               className="flex-1 text-white bg-transparent placeholder:text-gray-300 border border-slate-600 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/50 rounded-md"
             />
             <Button onClick={handleTambah} className="shrink-0">
@@ -165,6 +177,7 @@ export default function DashboardPage() {
                   <th className="p-3 text-left text-white">Judul Buku</th>
                   <th className="p-3 text-left text-white">Pengarang</th>
                   <th className="p-3 text-left text-white">Peminjam</th>
+                  <th className="p-3 text-left text-white">Petugas</th>{" "}
                   <th className="p-3 text-left text-white">Tanggal Pinjam</th>
                   <th className="p-3 text-left text-white">Tanggal Kembali</th>
                   <th className="p-3 text-left text-white">Status</th>
@@ -181,6 +194,7 @@ export default function DashboardPage() {
                     <td className="p-3 text-gray-100">{b.judul}</td>
                     <td className="p-3 text-gray-100">{b.pengarang}</td>
                     <td className="p-3 text-gray-100">{b.peminjam}</td>
+                    <td className="p-3 text-gray-100">{b.petugas}</td>{" "}
                     <td className="p-3 text-gray-100">{b.tanggalPinjam}</td>
                     <td className="p-3 text-gray-100">
                       {b.tanggalKembali || "-"}

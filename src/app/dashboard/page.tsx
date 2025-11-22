@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { supabase } from "@/lib/supabaseClient";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -13,34 +14,19 @@ interface Buku {
   peminjam: string;
   petugas: string;
   tanggalPinjam: string;
-  tanggalKembali: string;
+  tanggalKembali: string | null;
   jenisBuku: string[];
 }
 
 export default function DashboardPage() {
-  const [bukuList, setBukuList] = useState<Buku[]>([
-    {
-      id: 1,
-      judul: "Matematika Dasar",
-      pengarang: "Prof. Sukirman",
-      peminjam: "Ghaly",
-      petugas: "Bu Siti",
-      tanggalPinjam: "2025-10-07",
-      tanggalKembali: "2025-10-14",
-      jenisBuku: ["Pendidikan"],
-    },
-    {
-      id: 2,
-      judul: "Fisika Lanjut",
-      pengarang: "Dr. Ahmad Fauzi",
-      peminjam: "Naufal",
-      petugas: "Pak Budi",
-      tanggalPinjam: "2025-10-01",
-      tanggalKembali: "",
-      jenisBuku: ["Pendidikan", "Referensi"],
-    },
-  ]);
+  // --- State untuk READ nyata dari Supabase ---
+  const [bukuSupabase, setBukuSupabase] = useState<Buku[]>([]);
+  const [loading, setLoading] = useState(true);
 
+  // --- State untuk CRUD dummy (popok bawang) ---
+  const [bukuList, setBukuList] = useState<Buku[]>([]);
+
+  // --- Input form state ---
   const [newBukuJudul, setNewBukuJudul] = useState("");
   const [newPengarang, setNewPengarang] = useState("");
   const [newPeminjam, setNewPeminjam] = useState("");
@@ -62,6 +48,27 @@ export default function DashboardPage() {
     );
   };
 
+  // --- FETCH DATA (READ nyata) ---
+  const fetchData = async () => {
+    setLoading(true);
+    const { data, error } = await supabase.from("buku_pinjaman").select("*");
+    if (error) {
+      console.error("Gagal fetch:", error);
+    } else {
+      const mappedData = data.map((item) => ({
+        ...item,
+        jenisBuku: item.jenisBuku || [],
+      }));
+      setBukuSupabase(mappedData);
+    }
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  // --- CREATE dummy ---
   const handleTambah = () => {
     if (
       !newBukuJudul ||
@@ -70,13 +77,12 @@ export default function DashboardPage() {
       !newPetugas ||
       selectedJenisBuku.length === 0
     ) {
-      return alert(
-        "Isi judul, pengarang, peminjam, petugas, dan minimal satu jenis buku!"
-      );
+      return alert("Isi semua field dan pilih minimal satu jenis buku!");
     }
 
     const nextId =
       bukuList.length > 0 ? Math.max(...bukuList.map((b) => b.id)) + 1 : 1;
+    const tanggalPinjam = new Date().toISOString().split("T")[0];
 
     const newBuku: Buku = {
       id: nextId,
@@ -84,8 +90,8 @@ export default function DashboardPage() {
       pengarang: newPengarang,
       peminjam: newPeminjam,
       petugas: newPetugas,
-      tanggalPinjam: new Date().toISOString().split("T")[0],
-      tanggalKembali: "",
+      tanggalPinjam,
+      tanggalKembali: null,
       jenisBuku: selectedJenisBuku,
     };
 
@@ -97,10 +103,12 @@ export default function DashboardPage() {
     setSelectedJenisBuku([]);
   };
 
+  // --- DELETE dummy ---
   const handleHapus = (id: number) => {
     setBukuList(bukuList.filter((b) => b.id !== id));
   };
 
+  // --- UPDATE dummy (Tandai Kembali) ---
   const handleToggleKembali = (id: number) => {
     setBukuList(
       bukuList.map((b) => {
@@ -108,7 +116,7 @@ export default function DashboardPage() {
           return {
             ...b,
             tanggalKembali: b.tanggalKembali
-              ? ""
+              ? null
               : new Date().toISOString().split("T")[0],
           };
         }
@@ -118,15 +126,17 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8">
+    <div className="max-w-6xl mx-auto space-y-8 p-4">
       <h1 className="text-3xl font-bold text-white text-center md:text-left">
         Peminjaman Buku Perpustakaan
       </h1>
 
-      {/* Form Input Buku */}
+      {/* Form Tambah Peminjaman (CRUD dummy) */}
       <Card className="bg-slate-800 border border-blue-700/50">
         <CardHeader>
-          <CardTitle className="text-white">Tambah Peminjaman Baru</CardTitle>
+          <CardTitle className="text-white">
+            Tambah Peminjaman Baru (Dummy)
+          </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div>
@@ -141,7 +151,6 @@ export default function DashboardPage() {
               className="w-full text-white bg-transparent placeholder:text-gray-300 border border-slate-600 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/50 rounded-md"
             />
           </div>
-
           <div>
             <Label htmlFor="pengarang" className="text-white block mb-1">
               Nama Pengarang
@@ -154,7 +163,6 @@ export default function DashboardPage() {
               className="w-full text-white bg-transparent placeholder:text-gray-300 border border-slate-600 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/50 rounded-md"
             />
           </div>
-
           <div>
             <Label htmlFor="peminjam" className="text-white block mb-1">
               Nama Peminjam
@@ -167,7 +175,6 @@ export default function DashboardPage() {
               className="w-full text-white bg-transparent placeholder:text-gray-300 border border-slate-600 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/50 rounded-md"
             />
           </div>
-
           <div>
             <Label htmlFor="petugas" className="text-white block mb-1">
               Nama Petugas
@@ -202,12 +209,12 @@ export default function DashboardPage() {
           </div>
 
           <Button onClick={handleTambah} className="w-full md:w-auto">
-            Tambah Peminjaman
+            Tambah (Dummy)
           </Button>
         </CardContent>
       </Card>
 
-      {/* Stats Cards */}
+      {/* Stats (dummy) */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card className="bg-slate-800 border border-blue-700/50">
           <CardHeader>
@@ -243,92 +250,80 @@ export default function DashboardPage() {
         </Card>
       </div>
 
-      {/* Tabel Riwayat Peminjaman */}
+      {/* Riwayat Peminjaman (READ nyata dari Supabase) */}
       <Card className="bg-slate-800 border border-blue-700/50">
         <CardHeader>
-          <CardTitle className="text-white">Riwayat Peminjaman</CardTitle>
+          <CardTitle className="text-white">
+            Riwayat Peminjaman (Supabase)
+          </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="overflow-x-auto">
-            <table className="w-full border-collapse">
-              <thead>
-                <tr className="border-b border-slate-600">
-                  <th className="p-3 text-left text-white">ID</th>
-                  <th className="p-3 text-left text-white">Judul Buku</th>
-                  <th className="p-3 text-left text-white">Jenis</th>
-                  <th className="p-3 text-left text-white">Pengarang</th>
-                  <th className="p-3 text-left text-white">Peminjam</th>
-                  <th className="p-3 text-left text-white">Petugas</th>
-                  <th className="p-3 text-left text-white">Tanggal Pinjam</th>
-                  <th className="p-3 text-left text-white">Tanggal Kembali</th>
-                  <th className="p-3 text-left text-white">Status</th>
-                  <th className="p-3 text-left text-white">Aksi</th>
-                </tr>
-              </thead>
-              <tbody>
-                {bukuList.map((b) => (
-                  <tr
-                    key={b.id}
-                    className="border-b border-slate-700 hover:bg-slate-700/50"
-                  >
-                    <td className="p-3 text-gray-100">{b.id}</td>
-                    <td className="p-3 text-gray-100">{b.judul}</td>
-                    <td className="p-3 text-gray-100">
-                      <div className="flex flex-wrap gap-1">
-                        {b.jenisBuku.map((jenis, idx) => (
-                          <span
-                            key={idx}
-                            className="px-2 py-0.5 bg-blue-600 text-white text-xs rounded"
-                          >
-                            {jenis}
-                          </span>
-                        ))}
-                      </div>
-                    </td>
-                    <td className="p-3 text-gray-100">{b.pengarang}</td>
-                    <td className="p-3 text-gray-100">{b.peminjam}</td>
-                    <td className="p-3 text-gray-100">{b.petugas}</td>
-                    <td className="p-3 text-gray-100">{b.tanggalPinjam}</td>
-                    <td className="p-3 text-gray-100">
-                      {b.tanggalKembali || "-"}
-                    </td>
-                    <td className="p-3">
-                      <span
-                        className={`px-2 py-1 rounded-full text-xs font-medium ${
-                          b.tanggalKembali
-                            ? "bg-green-600 text-white"
-                            : "bg-yellow-600 text-white"
-                        }`}
-                      >
-                        {b.tanggalKembali ? "Dikembalikan" : "Dipinjam"}
-                      </span>
-                    </td>
-                    <td className="p-3 space-x-2">
-                      <Button
-                        size="sm"
-                        variant={b.tanggalKembali ? "outline" : "default"}
-                        onClick={() => handleToggleKembali(b.id)}
-                        className={
-                          b.tanggalKembali
-                            ? "bg-green-600 hover:bg-green-700 text-white"
-                            : ""
-                        }
-                      >
-                        {b.tanggalKembali ? "Batalkan" : "Tandai Kembali"}
-                      </Button>
-                      <Button
-                        variant="destructive"
-                        size="sm"
-                        onClick={() => handleHapus(b.id)}
-                      >
-                        Hapus
-                      </Button>
-                    </td>
+          {loading ? (
+            <p className="text-white text-center">
+              Memuat data dari Supabase...
+            </p>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full border-collapse">
+                <thead>
+                  <tr className="border-b border-slate-600">
+                    <th className="p-3 text-left text-white">ID</th>
+                    <th className="p-3 text-left text-white">Judul Buku</th>
+                    <th className="p-3 text-left text-white">Jenis</th>
+                    <th className="p-3 text-left text-white">Pengarang</th>
+                    <th className="p-3 text-left text-white">Peminjam</th>
+                    <th className="p-3 text-left text-white">Petugas</th>
+                    <th className="p-3 text-left text-white">Tanggal Pinjam</th>
+                    <th className="p-3 text-left text-white">
+                      Tanggal Kembali
+                    </th>
+                    <th className="p-3 text-left text-white">Status</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody>
+                  {bukuSupabase.map((b) => (
+                    <tr
+                      key={b.id}
+                      className="border-b border-slate-700 hover:bg-slate-700/50"
+                    >
+                      <td className="p-3 text-gray-100">{b.id}</td>
+                      <td className="p-3 text-gray-100">{b.judul}</td>
+                      <td className="p-3 text-gray-100">
+                        <div className="flex flex-wrap gap-1">
+                          {b.jenisBuku.map((jenis, idx) => (
+                            <span
+                              key={idx}
+                              className="px-2 py-0.5 bg-blue-600 text-white text-xs rounded"
+                            >
+                              {jenis}
+                            </span>
+                          ))}
+                        </div>
+                      </td>
+                      <td className="p-3 text-gray-100">{b.pengarang}</td>
+                      <td className="p-3 text-gray-100">{b.peminjam}</td>
+                      <td className="p-3 text-gray-100">{b.petugas}</td>
+                      <td className="p-3 text-gray-100">{b.tanggalPinjam}</td>
+                      <td className="p-3 text-gray-100">
+                        {b.tanggalKembali || "-"}
+                      </td>
+                      <td className="p-3">
+                        <span
+                          className={`px-2 py-1 rounded-full text-xs font-medium ${
+                            b.tanggalKembali
+                              ? "bg-green-600 text-white"
+                              : "bg-yellow-600 text-white"
+                          }`}
+                        >
+                          {b.tanggalKembali ? "Dikembalikan" : "Dipinjam"}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>

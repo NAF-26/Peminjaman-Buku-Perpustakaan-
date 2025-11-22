@@ -30,7 +30,8 @@ export default function DashboardPage() {
       if (error) {
         setError("Gagal mengambil data: " + error.message);
       } else {
-        const bukuArray: Buku[] = (data || []).map((row: any) => ({
+        // Tidak pakai ": any" pada row
+        const bukuArray: Buku[] = (data || []).map((row) => ({
           ...row,
           jenisBuku: Array.isArray(row.jenisBuku)
             ? row.jenisBuku
@@ -55,7 +56,6 @@ export default function DashboardPage() {
       <h1 className="text-3xl font-bold text-white text-center md:text-left">
         Peminjaman Buku Perpustakaan
       </h1>
-
       {/* Tampilkan error jika gagal */}
       {error && (
         <div className="mb-4 p-2 bg-red-600 text-white rounded">{error}</div>

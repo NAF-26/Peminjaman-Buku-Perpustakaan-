@@ -54,8 +54,14 @@ export default function DashboardPage() {
         if (error) throw error;
 
         setBukuList(data || []);
-      } catch (err: any) {
-        setError("Gagal mengambil data dari database: " + err.message);
+      } catch (err: unknown) {
+        if (err instanceof Error) {
+          setError("Gagal mengambil data dari database: " + err.message);
+        } else {
+          setError(
+            "Terjadi kesalahan yang tidak diketahui saat mengambil data."
+          );
+        }
         console.error(err);
       } finally {
         setLoading(false);

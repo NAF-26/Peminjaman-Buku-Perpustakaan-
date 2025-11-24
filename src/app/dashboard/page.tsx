@@ -38,9 +38,7 @@ export default function DashboardPage() {
     "Komik",
   ];
 
-  // ===========================
   // LOAD DATA DARI SUPABASE
-  // ===========================
   const loadData = async () => {
     setLoading(true);
 
@@ -70,18 +68,14 @@ export default function DashboardPage() {
     loadData();
   }, []);
 
-  // ===========================
   // HANDLE CHECKBOX JENIS BUKU
-  // ===========================
   const handleJenisBukuChange = (jenis: string) => {
     setSelectedJenisBuku((prev) =>
       prev.includes(jenis) ? prev.filter((j) => j !== jenis) : [...prev, jenis]
     );
   };
 
-  // ===========================
   // TAMBAH KE SUPABASE
-  // ===========================
   const handleTambah = async () => {
     if (
       !newBukuJudul ||
@@ -120,17 +114,13 @@ export default function DashboardPage() {
     loadData();
   };
 
-  // ===========================
   // HAPUS
-  // ===========================
   const handleHapus = async (id: number) => {
     await supabase.from("peminjaman").delete().eq("id", id);
     loadData();
   };
 
-  // ===========================
   // UPDATE TANGGAL KEMBALI
-  // ===========================
   const handleToggleKembali = async (id: number) => {
     const buku = bukuList.find((b) => b.id === id);
     if (!buku) return;
@@ -147,9 +137,7 @@ export default function DashboardPage() {
     loadData();
   };
 
-  // ===========================
   // UI
-  // ===========================
   return (
     <div className="max-w-4xl mx-auto space-y-8">
       <h1 className="text-3xl font-bold text-white text-center md:text-left">
